@@ -11,7 +11,7 @@ import * as Path from "path";
 
 (async (): Promise<void> => {
 
-	const paperKeyPath: string = Path.resolve("./paperkey.txt");
+	const paperKeyPath: string = Path.resolve("./paperkey.txt"); // using paper key: "fluid hurdle ..."
 	const paperKeyData: Buffer = FS.readFileSync(paperKeyPath);
 	const paperKey: string = paperKeyData.toString("utf8");
 
