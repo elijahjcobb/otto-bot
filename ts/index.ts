@@ -5,16 +5,23 @@
  * github.com/elijahjcobb
  */
 
-import {KBBot, KBMessage, KBResponse} from "@elijahjcobb/keybase-bot-builder";
 import * as FS from "fs";
 import * as Path from "path";
-import {
-	DarkSky,
-	DarkSkyReportCurrently,
-	DarkSkyReportDaily,
-	DarkSkyReportHourly,
-	DarkSkyReportMinutely
-} from "@elijahjcobb/dark-sky";
+import {KBBot, KBMessage, KBResponse} from "@elijahjcobb/keybase-bot-builder";
+import {DarkSky, DarkSkyReportCurrently} from "@elijahjcobb/dark-sky";
+
+
+function getWindDirectionString(bearing: number): string {
+	if (bearing > 350 && bearing < 10) return "N";
+	else if (bearing > 10 && bearing < 80) return "NE";
+	else if (bearing > 80 && bearing < 100) return "E";
+	else if (bearing > 100 && bearing < 170) return "SE";
+	else if (bearing > 170 && bearing < 190) return "S";
+	else if (bearing > 190 && bearing < 260) return "SW";
+	else if (bearing > 260 && bearing < 280) return "W";
+	else if (bearing > 280 && bearing < 350) return "NW";
+	else return "sky";
+}
 
 (async (): Promise<void> => {
 
@@ -29,42 +36,13 @@ import {
 	const darkSky: DarkSky = new DarkSky(darkSkyKey, 47.121231, -88.564461);
 
 	bot.command({
-		name: "current",
+		name: "weather",
 		description: "Get the current weather.",
 		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
 
 			const report: DarkSkyReportCurrently = await darkSky.getCurrently();
-			await res.sendObject(report);
-		}
-	});
 
-	bot.command({
-		name: "minutely",
-		description: "Get the minutely weather forecast.",
-		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
-
-			const report: DarkSkyReportMinutely = await darkSky.getMinutely();
-			await res.sendObject(report);
-		}
-	});
-
-	bot.command({
-		name: "hourly",
-		description: "Get the hourly weather forecast.",
-		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
-
-			const report: DarkSkyReportHourly = await darkSky.getHourly();
-			await res.sendObject(report);
-		}
-	});
-
-	bot.command({
-		name: "daily",
-		description: "Get the daily weather forecast.",
-		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
-
-			const report: DarkSkyReportDaily = await darkSky.getDaily();
-			await res.sendObject(report);
+			await res.send(`It is currently ${report.currently.summary.toLowerCase()} and feels like ${report.currently.apparentTemperature.toFixed(0)}°F. The real temperature is ${report.currently.temperature.toFixed(0)}°F. There is wind coming from the ${getWindDirectionString(report.currently.windBearing)} at ${report.currently.windSpeed.toFixed(0)} mph. The cloud coverage is ${(report.currently.cloudCover * 100).toFixed(0)}% with a UV index of ${report.currently.uvIndex}.`);
 		}
 	});
 

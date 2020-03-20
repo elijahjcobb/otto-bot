@@ -51,7 +51,6 @@
 			true,
 			"match-declaration-order"
 		],
-		"only-arrow-functions": true,
 		"prefer-const": true,
 		"quotemark": [
 			true,
