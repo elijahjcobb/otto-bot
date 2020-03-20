@@ -31,13 +31,16 @@
 	},
 	"homepage": "https://github.com/elijahjcobb/otto-bot#readme",
 	"dependencies": {
-		"@elijahjcobb/keybase-bot-builder": "^0.1.3"
+		"@elijahjcobb/keybase-bot-builder": "latest",
+		"@element-ts/palladium": "latest",
+		"request": "latest",
+		"@types/request": "latest"
 	},
 	"devDependencies": {
+		"@types/jest": "latest",
 		"@types/node": "latest",
-		"typescript": "latest",
-		"tslint": "latest",
 		"jest": "latest",
-		"@types/jest": "latest"
+		"tslint": "latest",
+		"typescript": "latest"
 	}
 }
