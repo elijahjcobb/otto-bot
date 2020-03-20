@@ -8,8 +8,13 @@
 import {KBBot, KBMessage, KBResponse} from "@elijahjcobb/keybase-bot-builder";
 import * as FS from "fs";
 import * as Path from "path";
-import {DarkSky} from "./DarkSky";
-import {DarkSkyCurrentlyType, DarkSkyTypes} from "./darksky-types";
+import {
+	DarkSky,
+	DarkSkyReportCurrently,
+	DarkSkyReportDaily,
+	DarkSkyReportHourly,
+	DarkSkyReportMinutely
+} from "@elijahjcobb/dark-sky";
 
 (async (): Promise<void> => {
 
@@ -18,70 +23,48 @@ import {DarkSkyCurrentlyType, DarkSkyTypes} from "./darksky-types";
 	const paperKey: string = paperKeyData.toString("utf8");
 	const bot: KBBot = await KBBot.init("otto_bot", paperKey, {logging: true, debugging: true});
 
-	bot.command({
-		name: "pic",
-		description: "Receive a picture.",
-		usage: "!pic",
-		handler: async (message: KBMessage, res: KBResponse): Promise<void> => {
-			await res.sendFile("/home/elijah/Pictures/profile-small.jpeg");
-		}
-	});
+	const darkSkyKeyPath: string = Path.resolve("./dark-sky-secret.txt");
+	const darkSkyKeyData: Buffer = FS.readFileSync(darkSkyKeyPath);
+	const darkSkyKey: string = darkSkyKeyData.toString("utf8");
+	const darkSky: DarkSky = new DarkSky(darkSkyKey, 47.121231, -88.564461);
 
 	bot.command({
-		name: "add",
-		description: "Add all numbers provided together.",
-		usage: "!add 1 12 123 1234",
-		parameters: {},
-		handler: async (message: KBMessage, res: KBResponse): Promise<void> => {
-
-			const nums: (string | number)[] = message.getParameters();
-			let t: number = 0;
-			for (const num of nums) if (typeof num === "number") t += num;
-			await res.send(t);
-
-		}
-	});
-
-	bot.command({
-		name: "multiply",
-		description: "Multiply all numbers provided together.",
-		usage: "!multiply 4 5 6",
-		handler: async (message: KBMessage, res: KBResponse): Promise<void> => {
-
-			const nums: (string | number)[] = message.getParameters();
-			let t: number = 1;
-			for (const num of nums) if (typeof num === "number") t *= num;
-			await res.send(t);
-
-		}
-	});
-
-	bot.command({
-		name: "pow",
-		description: "Compute the power (-p) of a base (-b).",
-		usage: "!pow -b 2 -p 3",
-		parameters: {
-			"b": "number",
-			"p": "number"
-		},
-		handler: async (message: KBMessage, res: KBResponse): Promise<void> => {
-
-			const nums: {b?: number, p?: number} = message.getModifiers();
-			await res.send(Math.pow(nums.b ?? 0, nums.p ?? 0));
-
-		}
-	});
-
-	bot.command({
-		name: "weather",
-		description: "Get the current weather information.",
-		usage: "!weather",
+		name: "current",
+		description: "Get the current weather.",
 		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
 
-			const report: DarkSkyTypes = await DarkSky.getCurrent();
+			const report: DarkSkyReportCurrently = await darkSky.getCurrently();
+			await res.sendObject(report);
+		}
+	});
 
-			await res.send(`The weather in Houghton, MI is ${report.currently.summary}. It is ${report.currently.temperature.toFixed(0)}℉ but feels like ${report.currently.apparentTemperature.toFixed(0)}℉.`);
+	bot.command({
+		name: "minutely",
+		description: "Get the minutely weather forecast.",
+		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
 
+			const report: DarkSkyReportMinutely = await darkSky.getMinutely();
+			await res.sendObject(report);
+		}
+	});
+
+	bot.command({
+		name: "hourly",
+		description: "Get the hourly weather forecast.",
+		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
+
+			const report: DarkSkyReportHourly = await darkSky.getHourly();
+			await res.sendObject(report);
+		}
+	});
+
+	bot.command({
+		name: "daily",
+		description: "Get the daily weather forecast.",
+		handler: async(msg: KBMessage, res: KBResponse): Promise<void> => {
+
+			const report: DarkSkyReportDaily = await darkSky.getDaily();
+			await res.sendObject(report);
 		}
 	});
 

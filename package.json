@@ -32,9 +32,7 @@
 	"homepage": "https://github.com/elijahjcobb/otto-bot#readme",
 	"dependencies": {
 		"@elijahjcobb/keybase-bot-builder": "latest",
-		"@element-ts/palladium": "latest",
-		"request": "latest",
-		"@types/request": "latest"
+		"@elijahjcobb/dark-sky": "latest"
 	},
 	"devDependencies": {
 		"@types/jest": "latest",
